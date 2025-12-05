@@ -641,57 +641,57 @@ def _create_legend_html(neighborhood_markers, marker_ids):
         </div>
     </div>
 
+    <style>
+    .marker-highlighted {
+        filter: drop-shadow(0 0 6px rgba(255, 255, 0, 0.8)) !important;
+        transform: scale(1.4) !important;
+    }
+    </style>
+
     <script>
-    // Global map object reference
-    var mapObj = null;
+    // Global marker storage
+    var markerMap = {};
 
     function highlightMarker(markerId) {
-        if (!markerId) return;
-        var marker = document.querySelector('[data-marker-id="' + markerId + '"]');
-        if (marker && marker._leaflet_id !== undefined) {
-            var markerObject = map._layers[marker._leaflet_id];
-            if (markerObject && markerObject.setIcon) {
-                markerObject.setIcon(L.icon({
-                    className: 'leaflet-div-icon highlight-marker',
-                    iconSize: [35, 45],
-                    iconAnchor: [17, 45],
-                    popupAnchor: [0, -45]
-                }));
-            }
+        if (!markerId || !markerMap[markerId]) return;
+        var marker = markerMap[markerId];
+        if (marker && marker._icon) {
+            marker._icon.classList.add('marker-highlighted');
+            marker.setZIndexOffset(1000);
         }
     }
 
     function unhighlightMarker(markerId) {
-        if (!markerId) return;
-        var marker = document.querySelector('[data-marker-id="' + markerId + '"]');
-        if (marker && marker._leaflet_id !== undefined) {
-            var markerObject = map._layers[marker._leaflet_id];
-            if (markerObject && markerObject.setIcon) {
-                markerObject.setIcon(L.icon({
-                    className: 'leaflet-marker-icon',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34]
-                }));
-            }
+        if (!markerId || !markerMap[markerId]) return;
+        var marker = markerMap[markerId];
+        if (marker && marker._icon) {
+            marker._icon.classList.remove('marker-highlighted');
+            marker.setZIndexOffset(0);
         }
     }
 
     function panToMarker(markerId) {
-        if (!markerId || !window.map) return;
-
-        // Find marker by ID in all layers
-        for (var id in window.map._layers) {
-            var layer = window.map._layers[id];
-            if (layer instanceof L.Marker && layer.options && layer.options.id === markerId) {
-                window.map.setView(layer.getLatLng(), 16);
-                setTimeout(function() {
-                    layer.openPopup();
-                }, 300);
-                return;
-            }
-        }
+        if (!markerId || !markerMap[markerId]) return;
+        var marker = markerMap[markerId];
+        window.map.setView(marker.getLatLng(), 16);
+        setTimeout(function() {
+            marker.openPopup();
+        }, 300);
     }
+
+    // Hook into map creation to store marker references
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            if (window.map && window.map._layers) {
+                for (var id in window.map._layers) {
+                    var layer = window.map._layers[id];
+                    if (layer instanceof L.Marker && layer.options && layer.options.id) {
+                        markerMap[layer.options.id] = layer;
+                    }
+                }
+            }
+        }, 500);
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
         // Make legend draggable
