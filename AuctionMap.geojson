@@ -1,0 +1,491 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.17423952614983,
+          39.995621555991285
+        ]
+      },
+      "properties": {
+        "auction_id": "1242353",
+        "status": "Preview",
+        "min_bid": 5700,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2511-2022",
+        "opa": "871537050",
+        "address": "2601 WEST HAROLD STREET PHILADELPHIA PA 19132",
+        "lat": 39.995621555991285,
+        "lng": -75.17423952614983,
+        "neighborhood": "19132",
+        "phila_link": "https://property.phila.gov/?p=871537050",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1242353",
+        "streetview": "https://www.google.com/maps/place/2601+WEST+HAROLD+STREET+PHILADELPHIA+PA+19132/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.20391814131423,
+          39.96712005783358
+        ]
+      },
+      "properties": {
+        "auction_id": "1248882",
+        "status": "Preview",
+        "min_bid": 39000,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2023",
+        "opa": "061190000",
+        "address": "785 NORTH PRESTON STREET PHILADELPHIA PA 19104",
+        "lat": 39.96712005783358,
+        "lng": -75.20391814131423,
+        "neighborhood": "Belmont",
+        "phila_link": "https://property.phila.gov/?p=061190000",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1248882",
+        "streetview": "https://www.google.com/maps/place/785+NORTH+PRESTON+STREET+PHILADELPHIA+PA+19104/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.09217063956908,
+          40.01940657338656
+        ]
+      },
+      "properties": {
+        "auction_id": "1248888",
+        "status": "Preview",
+        "min_bid": 138900,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2030",
+        "opa": "885481685",
+        "address": "4650 LARGE STREET PHILADELPHIA PA 19124",
+        "lat": 40.01940657338656,
+        "lng": -75.09217063956908,
+        "neighborhood": "Northwood",
+        "phila_link": "https://property.phila.gov/?p=885481685",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1248888",
+        "streetview": "https://www.google.com/maps/place/4650+LARGE+STREET+PHILADELPHIA+PA+19124/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.16085745113665,
+          40.04661056908587
+        ]
+      },
+      "properties": {
+        "auction_id": "1242348",
+        "status": "Preview",
+        "min_bid": 4200,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2509-2026",
+        "opa": "122257700",
+        "address": "5617 NELSON STREET PHILADELPHIA PA 19138",
+        "lat": 40.04661056908587,
+        "lng": -75.16085745113665,
+        "neighborhood": "East Germantown",
+        "phila_link": "https://property.phila.gov/?p=122257700",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1242348",
+        "streetview": "https://www.google.com/maps/place/5617+NELSON+STREET+PHILADELPHIA+PA+19138/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1374728773318,
+          39.994081622228734
+        ]
+      },
+      "properties": {
+        "auction_id": "1248884",
+        "status": "Preview",
+        "min_bid": 7000,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2025",
+        "opa": "192121300",
+        "address": "2834 NORTH ORIANNA STREET PHILADELPHIA PA 19133",
+        "lat": 39.994081622228734,
+        "lng": -75.1374728773318,
+        "neighborhood": "West Kensington",
+        "phila_link": "https://property.phila.gov/?p=192121300",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1248884",
+        "streetview": "https://www.google.com/maps/place/2834+NORTH+ORIANNA+STREET+PHILADELPHIA+PA+19133/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.14939346380318,
+          39.99057836596344
+        ]
+      },
+      "properties": {
+        "auction_id": "1250495",
+        "status": "Preview",
+        "min_bid": 16000,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2031",
+        "opa": "371179600",
+        "address": "2512 NORTH WARNOCK STREET PHILADELPHIA PA 19133",
+        "lat": 39.99057836596344,
+        "lng": -75.14939346380318,
+        "neighborhood": "Hartranft",
+        "phila_link": "https://property.phila.gov/?p=371179600",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1250495",
+        "streetview": "https://www.google.com/maps/place/2512+NORTH+WARNOCK+STREET+PHILADELPHIA+PA+19133/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1792463,
+          40.0584078
+        ]
+      },
+      "properties": {
+        "auction_id": "1242047",
+        "status": "Preview",
+        "min_bid": 13600,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2511-2015",
+        "opa": "222028000",
+        "address": "450 VERNON ROAD PHILADELPHIA PA 19119",
+        "lat": 40.0584078,
+        "lng": -75.1792463,
+        "neighborhood": "East Mount Airy",
+        "phila_link": "https://property.phila.gov/?p=222028000",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1242047",
+        "streetview": "https://www.google.com/maps/place/450+VERNON+ROAD+PHILADELPHIA+PA+19119/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1465956,
+          39.9947479
+        ]
+      },
+      "properties": {
+        "auction_id": "1242350",
+        "status": "Preview",
+        "min_bid": 7500,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2511-2004",
+        "opa": "372175900",
+        "address": "2808 NORTH HUTCHINSON STREET PHILADELPHIA PA 19133",
+        "lat": 39.9947479,
+        "lng": -75.1465956,
+        "neighborhood": "19133",
+        "phila_link": "https://property.phila.gov/?p=372175900",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1242350",
+        "streetview": "https://www.google.com/maps/place/2808+NORTH+HUTCHINSON+STREET+PHILADELPHIA+PA+19133/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.1562733,
+          39.9394556
+        ]
+      },
+      "properties": {
+        "auction_id": "1250490",
+        "status": "Preview",
+        "min_bid": 43700,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2001",
+        "opa": "022261600",
+        "address": "802 SOUTH 8TH STREET PHILADELPHIA PA 19147",
+        "lat": 39.9394556,
+        "lng": -75.1562733,
+        "neighborhood": "Bella Vista",
+        "phila_link": "https://property.phila.gov/?p=022261600",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1250490",
+        "streetview": "https://www.google.com/maps/place/802+SOUTH+8TH+STREET+PHILADELPHIA+PA+19147/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.2446737,
+          39.9481951
+        ]
+      },
+      "properties": {
+        "auction_id": "1250496",
+        "status": "Preview",
+        "min_bid": 16600,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2033",
+        "opa": "033107200",
+        "address": "6027 WASHINGTON AVENUE PHILADELPHIA PA 19143",
+        "lat": 39.9481951,
+        "lng": -75.2446737,
+        "neighborhood": "Cobbs Creek",
+        "phila_link": "https://property.phila.gov/?p=033107200",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1250496",
+        "streetview": "https://www.google.com/maps/place/6027+WASHINGTON+AVENUE+PHILADELPHIA+PA+19143/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.08647800580063,
+          40.009446997301445
+        ]
+      },
+      "properties": {
+        "auction_id": "1259279",
+        "status": "Preview",
+        "min_bid": 25900,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2509-2008",
+        "opa": "232259600",
+        "address": "4279 ORCHARD STREET PHILADELPHIA PA 19124",
+        "lat": 40.009446997301445,
+        "lng": -75.08647800580063,
+        "neighborhood": "19124",
+        "phila_link": "https://property.phila.gov/?p=232259600",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1259279",
+        "streetview": "https://www.google.com/maps/place/4279+ORCHARD+STREET+PHILADELPHIA+PA+19124/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.16474569489462,
+          39.99117089337419
+        ]
+      },
+      "properties": {
+        "auction_id": "1242345",
+        "status": "Preview",
+        "min_bid": 7400,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2509-2005",
+        "opa": "162135600",
+        "address": "2425 NORTH 20TH STREET PHILADELPHIA PA 19132",
+        "lat": 39.99117089337419,
+        "lng": -75.16474569489462,
+        "neighborhood": "19132",
+        "phila_link": "https://property.phila.gov/?p=162135600",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1242345",
+        "streetview": "https://www.google.com/maps/place/2425+NORTH+20TH+STREET+PHILADELPHIA+PA+19132/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.159656849857,
+          40.01184107310743
+        ]
+      },
+      "properties": {
+        "auction_id": "1242351",
+        "status": "Preview",
+        "min_bid": 4200,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2511-2012",
+        "opa": "131082000",
+        "address": "1926 WEST BUTLER STREET PHILADELPHIA PA 19140",
+        "lat": 40.01184107310743,
+        "lng": -75.159656849857,
+        "neighborhood": "Nicetown",
+        "phila_link": "https://property.phila.gov/?p=131082000",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1242351",
+        "streetview": "https://www.google.com/maps/place/1926+WEST+BUTLER+STREET+PHILADELPHIA+PA+19140/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.24431157798378,
+          39.972403543362994
+        ]
+      },
+      "properties": {
+        "auction_id": "1248880",
+        "status": "Preview",
+        "min_bid": 6100,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2021",
+        "opa": "342342300",
+        "address": "1402 NORTH FELTON STREET PHILADELPHIA PA 19151",
+        "lat": 39.972403543362994,
+        "lng": -75.24431157798378,
+        "neighborhood": "Carroll Park",
+        "phila_link": "https://property.phila.gov/?p=342342300",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1248880",
+        "streetview": "https://www.google.com/maps/place/1402+NORTH+FELTON+STREET+PHILADELPHIA+PA+19151/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.14901880996594,
+          40.008161677666244
+        ]
+      },
+      "properties": {
+        "auction_id": "1250497",
+        "status": "Preview",
+        "min_bid": 16400,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2038",
+        "opa": "432176400",
+        "address": "3635 NORTH 13TH STREET PHILADELPHIA PA 19140",
+        "lat": 40.008161677666244,
+        "lng": -75.14901880996594,
+        "neighborhood": "Nicetown",
+        "phila_link": "https://property.phila.gov/?p=432176400",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1250497",
+        "streetview": "https://www.google.com/maps/place/3635+NORTH+13TH+STREET+PHILADELPHIA+PA+19140/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.16816666243939,
+          39.99067598597212
+        ]
+      },
+      "properties": {
+        "auction_id": "1242346",
+        "status": "Preview",
+        "min_bid": 5100,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2509-2006",
+        "opa": "162206701",
+        "address": "2356 NORTH BEECHWOOD STREET PHILADELPHIA PA 19132",
+        "lat": 39.99067598597212,
+        "lng": -75.16816666243939,
+        "neighborhood": "19132",
+        "phila_link": "https://property.phila.gov/?p=162206701",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1242346",
+        "streetview": "https://www.google.com/maps/place/2356+NORTH+BEECHWOOD+STREET+PHILADELPHIA+PA+19132/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.23940103469613,
+          39.961124113968516
+        ]
+      },
+      "properties": {
+        "auction_id": "1248881",
+        "status": "Preview",
+        "min_bid": 13300,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2022",
+        "opa": "031131900",
+        "address": "21 SOUTH REDFIELD STREET PHILADELPHIA PA 19139",
+        "lat": 39.961124113968516,
+        "lng": -75.23940103469613,
+        "neighborhood": "Haddington",
+        "phila_link": "https://property.phila.gov/?p=031131900",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1248881",
+        "streetview": "https://www.google.com/maps/place/21+SOUTH+REDFIELD+STREET+PHILADELPHIA+PA+19139/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.17076239961132,
+          40.02798321705513
+        ]
+      },
+      "properties": {
+        "auction_id": "1254492",
+        "status": "Preview",
+        "min_bid": 15900,
+        "open_date": "2026-01-27 10:00:00",
+        "attorney": "LINEBARGER GOGGAN BLAIR & SAMPSON, LLP",
+        "debt_amount": 0,
+        "book_writ": "2601-2010",
+        "opa": "123102600",
+        "address": "175 HANSBERRY STREET PHILADELPHIA PA 19144",
+        "lat": 40.02798321705513,
+        "lng": -75.17076239961132,
+        "neighborhood": "Germantown - Penn Knox",
+        "phila_link": "https://property.phila.gov/?p=123102600",
+        "bid4assets_link": "https://www.bid4assets.com/auction/index/1254492",
+        "streetview": "https://www.google.com/maps/place/175+HANSBERRY+STREET+PHILADELPHIA+PA+19144/"
+      }
+    }
+  ]
+}

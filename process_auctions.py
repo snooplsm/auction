@@ -119,16 +119,26 @@ def haversine_distance(lat1, lng1, lat2, lng2):
     return c * r * 5280  # Convert to feet
 
 
-async def get_neighborhood(session, cache_conn, lat, lng):
-    """Get neighborhood from coordinates using Nominatim reverse geocoding."""
+async def get_neighborhood(session, cache_conn, lat, lng, address_str=None):
+    """Get neighborhood from coordinates using Nominatim reverse geocoding, fallback to zipcode."""
     if lat is None or lng is None:
-        return "Unknown"
+        return ""
 
     # Check cache first
     cached_neighborhood = cache_get_neighborhood(cache_conn, lat, lng)
     if cached_neighborhood:
         logger.debug(f"[CACHE HIT] Neighborhood for ({lat:.4f}, {lng:.4f}) -> {cached_neighborhood}")
         return cached_neighborhood
+
+    # Extract zipcode from address string early for fallback (format: "ADDRESS CITY STATE ZIPCODE")
+    zipcode_fallback = ""
+    if address_str:
+        parts = address_str.strip().split()
+        if len(parts) > 0:
+            # The last part should be the zipcode
+            potential_zipcode = parts[-1]
+            if potential_zipcode.isdigit() and len(potential_zipcode) == 5:
+                zipcode_fallback = potential_zipcode
 
     try:
         # Use Nominatim reverse geocoding
@@ -153,8 +163,8 @@ async def get_neighborhood(session, cache_conn, lat, lng):
                 logger.debug(f"[NOMINATIM REVERSE] Residential field: {address.get('residential')}")
                 logger.debug(f"[NOMINATIM REVERSE] Neighbourhood field: {address.get('neighbourhood')}")
 
-                # Prefer residential field, fall back to neighbourhood
-                neighborhood = address.get("residential") or address.get("neighbourhood") or "Unknown"
+                # Prefer residential field, fall back to neighbourhood, then zipcode
+                neighborhood = address.get("residential") or address.get("neighbourhood") or zipcode_fallback
                 logger.info(f"[NOMINATIM REVERSE] Found neighborhood: {neighborhood} for ({lat:.4f}, {lng:.4f})")
 
                 # Cache the result
@@ -165,7 +175,13 @@ async def get_neighborhood(session, cache_conn, lat, lng):
     except Exception as e:
         logger.error(f"[NOMINATIM REVERSE] Error getting neighborhood: {e}", exc_info=True)
 
-    return "Unknown"
+    # Return zipcode if available, otherwise empty string
+    if zipcode_fallback:
+        logger.info(f"[ZIPCODE FALLBACK] Using zipcode: {zipcode_fallback}")
+        cache_set_neighborhood(cache_conn, lat, lng, zipcode_fallback)
+        return zipcode_fallback
+
+    return ""
 
 
 def cluster_properties(properties, max_distance_feet=300):
@@ -361,7 +377,39 @@ def split_ampersand_field(value):
 # -------------------------------------------
 # MAP GENERATION
 # -------------------------------------------
-def create_interactive_map(results, map_path):
+def update_html_title(html_path, filename):
+    """Update HTML page title based on filename. If filename is yyyymmdd format, convert to 'MMMM dd, yyyy'."""
+    import os
+    from datetime import datetime
+
+    # Extract filename without extension
+    base_name = os.path.splitext(os.path.basename(filename))[0]
+
+    # Try to parse as yyyymmdd format
+    title = base_name
+    try:
+        if len(base_name) == 8 and base_name.isdigit():
+            date_obj = datetime.strptime(base_name, "%Y%m%d")
+            title = date_obj.strftime("%B %d, %Y")
+    except (ValueError, AttributeError):
+        pass
+
+    # Read HTML and update title
+    with open(html_path, 'r', encoding='utf-8') as f:
+        html_content = f.read()
+
+    # Replace or insert title in <head>
+    if '<title>' in html_content:
+        html_content = re.sub(r'<title>.*?</title>', f'<title>{title}</title>', html_content)
+    else:
+        # If no title tag, add one after <head>
+        html_content = re.sub(r'(<head>)', f'\\1\n    <title>{title}</title>', html_content)
+
+    with open(html_path, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+
+
+def create_interactive_map(results, map_path, input_filename=None):
     """Create an interactive Folium map with neighborhood legend and proximity clustering."""
     logger.info("Creating interactive map...")
 
@@ -376,12 +424,18 @@ def create_interactive_map(results, map_path):
     center_lng = sum(r["lng"] for r in valid_results) / len(valid_results)
     logger.info(f"Map center: ({center_lat:.4f}, {center_lng:.4f})")
 
-    # Create map
+    # Create map with Philadelphia bounds
+    # Philadelphia approximate bounds: [39.87, -75.28] to [40.14, -74.96]
     map_obj = folium.Map(
         location=[center_lat, center_lng],
         zoom_start=12,
-        tiles="OpenStreetMap",
-        prefer_canvas=True
+        tiles="CartoDB positron",
+        prefer_canvas=True,
+        max_bounds=True,
+        min_lat=39.87,
+        max_lat=40.14,
+        min_lon=-75.28,
+        max_lon=-74.96
     )
 
     # Group properties by neighborhood
@@ -419,17 +473,6 @@ def create_interactive_map(results, map_path):
             if len(cluster) == 1:
                 # Single property
                 r = cluster[0]
-                popup_html = _create_popup_html(r)
-                popup = folium.Popup(popup_html, max_width=350)
-                marker_color, marker_icon = _get_marker_color_icon(r['status'])
-
-                marker = folium.Marker(
-                    location=[r['lat'], r['lng']],
-                    popup=popup,
-                    tooltip=f"{r['address']} - {r['status']}",
-                    icon=folium.Icon(color=marker_color, icon=marker_icon, prefix='fa')
-                )
-                marker.add_to(fg)
 
                 # Store marker ID for legend interaction
                 marker_id = f"marker_{marker_id_counter}"
@@ -438,15 +481,34 @@ def create_interactive_map(results, map_path):
                     marker_ids[neighborhood] = {}
                 marker_ids[neighborhood][r['address']] = marker_id
 
-                # Add custom attribute to marker for CSS targeting
-                marker.options['id'] = marker_id
+                # Create popup with hidden marker ID for reference
+                popup_html = f'<div data-marker-id="{marker_id}" style="display:none;">{marker_id}</div>{_create_popup_html(r)}'
+                popup = folium.Popup(popup_html, max_width=350)
+                marker_color, marker_icon = _get_marker_color_icon(r['status'])
+
+                # Create marker
+                marker = folium.Marker(
+                    location=[r['lat'], r['lng']],
+                    popup=popup,
+                    tooltip=f"{r['address']} - {r['status']}",
+                    icon=folium.Icon(color=marker_color, icon=marker_icon, prefix='fa')
+                )
+                marker.options['markerId'] = marker_id
+                marker.add_to(fg)
             else:
                 # Clustered properties - create a cluster marker
                 cluster_lat = sum(p["lat"] for p in cluster) / len(cluster)
                 cluster_lng = sum(p["lng"] for p in cluster) / len(cluster)
 
+                # Store marker ID for cluster
+                marker_id = f"marker_{marker_id_counter}"
+                marker_id_counter += 1
+                for prop in cluster:
+                    marker_ids[neighborhood][prop['address']] = marker_id
+
                 # Create HTML for cluster popup
                 cluster_html = f"""
+                <div style="display:none;" data-marker-id="{marker_id}">{marker_id}</div>
                 <div style="width: 400px; font-family: Arial, sans-serif; font-size: 12px;">
                     <h4 style="margin-top: 0; margin-bottom: 10px;">Properties Cluster ({len(cluster)} nearby)</h4>
                     <div style="max-height: 300px; overflow-y: auto;">
@@ -477,14 +539,10 @@ def create_interactive_map(results, map_path):
                     tooltip=f"Cluster: {len(cluster)} properties within 300 feet",
                     icon=folium.Icon(color='red', icon='sitemap', prefix='fa')
                 )
-                marker.add_to(fg)
 
-                # Store marker IDs for all properties in cluster
-                marker_id = f"marker_{marker_id_counter}"
-                marker_id_counter += 1
-                for prop in cluster:
-                    marker_ids[neighborhood][prop['address']] = marker_id
-                marker.options['id'] = marker_id
+                # Add marker ID to options for JavaScript reference
+                marker.options['markerId'] = marker_id
+                marker.add_to(fg)
 
         fg.add_to(map_obj)
 
@@ -492,6 +550,20 @@ def create_interactive_map(results, map_path):
     legend_html = _create_legend_html(neighborhood_markers, marker_ids)
     from folium import Element
     map_obj.get_root().html.add_child(Element(legend_html))
+
+    # Create a script that will be injected to register all markers
+    marker_registration = """
+    <script>
+    window.markerDatabase = {};
+
+    function registerMarker(markerId, marker) {
+        window.markerDatabase[markerId] = marker;
+        console.log('Registered marker:', markerId);
+    }
+    </script>
+    """
+    map_obj.get_root().html.add_child(Element(marker_registration))
+
 
     # Add layer control
     folium.LayerControl().add_to(map_obj)
@@ -501,6 +573,10 @@ def create_interactive_map(results, map_path):
     logger.info(f"✔ Interactive map saved to: {map_path}")
     print(f"✔ Interactive map saved to: {map_path}")
 
+    # Update page title based on input filename
+    if input_filename:
+        update_html_title(map_path, input_filename)
+
 
 def _create_popup_html(r):
     """Create popup HTML for a single property."""
@@ -508,12 +584,24 @@ def _create_popup_html(r):
     min_bid_str = format_currency(r['min_bid'])
     debt_amount_str = format_currency(r['debt_amount'])
 
+    # Create linked Auction ID
+    auction_id = r['auction_id']
+    if r['bid4assets_link']:
+        auction_id_display = f"<a href='{r['bid4assets_link']}' target='_blank'>{auction_id}</a>"
+    else:
+        auction_id_display = str(auction_id)
+
+    # Create linked OPA ID
+    opa_display = r['opa'] or 'N/A'
+    if r['opa'] and r['phila_link']:
+        opa_display = f"<a href='{r['phila_link']}' target='_blank'>{r['opa']}</a>"
+
     popup_html = f"""
     <div style="width: 320px; font-family: Arial, sans-serif; font-size: 12px;">
         <h4 style="margin-top: 0; margin-bottom: 10px;">{r['address']}</h4>
 
         <div style="margin-bottom: 10px;">
-            <strong>Auction ID:</strong> {r['auction_id']}<br>
+            <strong>Auction ID:</strong> {auction_id_display}<br>
             <strong>Neighborhood:</strong> {r.get('neighborhood', 'Unknown')}<br>
             <strong>Status:</strong> {r['status']}<br>
             <strong>Start Price:</strong> {min_bid_str}<br>
@@ -522,7 +610,7 @@ def _create_popup_html(r):
 
         <div style="margin-bottom: 10px;">
             <strong>Property Info:</strong><br>
-            OPA: {r['opa'] or 'N/A'}<br>
+            OPA: {opa_display}<br>
             Book/Writ: {r['book_writ'] or 'N/A'}<br>
             Debt Amount: {debt_amount_str}
         </div>
@@ -530,12 +618,6 @@ def _create_popup_html(r):
         <div style="margin-bottom: 10px;">
             <strong>Links:</strong><br>
     """
-
-    if r['bid4assets_link']:
-        popup_html += f"<a href='{r['bid4assets_link']}' target='_blank'>🔨 Bid4Assets Auction</a><br>"
-
-    if r['phila_link']:
-        popup_html += f"<a href='{r['phila_link']}' target='_blank'>🏠 Philly OPA Record</a><br>"
 
     if r['streetview']:
         popup_html += f"<a href='{r['streetview']}' target='_blank'>🚗 Google Street View</a><br>"
@@ -599,10 +681,8 @@ def _create_legend_html(neighborhood_markers, marker_ids):
         for prop in sorted(properties, key=lambda x: x['address']):
             marker_id = marker_ids.get(neighborhood, {}).get(prop['address'], '')
             addresses_html += f"""
-            <div class="address-item" data-marker-id="{marker_id}" style="padding: 6px 8px; margin: 4px 0; background: #f0f0f0; border-radius: 3px; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#ddd'; highlightMarker('{marker_id}');" onmouseout="this.style.backgroundColor='#f0f0f0'; unhighlightMarker('{marker_id}');" onclick="panToMarker('{marker_id}');">
-                <a href="{prop['bid4assets_link']}" target="_blank" style="color: #0066cc; text-decoration: none;" onclick="event.stopPropagation();">
-                    {prop['address']}
-                </a>
+            <div class="address-item" data-marker-id="{marker_id}" style="padding: 6px 8px; margin: 4px 0; background: #f0f0f0; border-radius: 3px; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="highlightMarker('{marker_id}'); this.style.backgroundColor='#ddd';" onmouseout="unhighlightMarker('{marker_id}'); this.style.backgroundColor='#f0f0f0';" onclick="event.stopPropagation(); panToMarker('{marker_id}');">
+                {prop['address']}
             </div>
             """
         addresses_html += '</div>'
@@ -643,55 +723,122 @@ def _create_legend_html(neighborhood_markers, marker_ids):
 
     <style>
     .marker-highlighted {
-        filter: drop-shadow(0 0 6px rgba(255, 255, 0, 0.8)) !important;
-        transform: scale(1.4) !important;
+        filter: drop-shadow(0 0 8px rgba(255, 255, 0, 0.9)) !important;
+        transform: scale(2) !important;
+        transform-origin: center bottom !important;
+        z-index: 9999 !important;
     }
     </style>
 
     <script>
-    // Global marker storage
-    var markerMap = {};
+    var cachedMapInstance = null;
+    var markerRegistry = {};  // Maps markerId -> layer object
+
+    // Capture map when page fully loads (after Folium creates it)
+    window.onload = function() {
+        console.log('Window onload - looking for Folium map');
+
+        // Folium stores the map as a variable in window scope
+        // Search window for any object that looks like a Leaflet map
+        for (var key in window) {
+            try {
+                var obj = window[key];
+                // Check if this looks like a Leaflet map
+                if (obj && typeof obj === 'object' && obj._layers && obj.setView && obj._container) {
+                    cachedMapInstance = obj;
+                    console.log('SUCCESS! Found map in window.' + key);
+                    console.log('Map has', Object.keys(obj._layers).length, 'layers');
+
+                    // Build marker registry by checking layer options
+                    buildMarkerRegistry();
+                    console.log('Marker registry built with', Object.keys(markerRegistry).length, 'markers');
+
+                    return;
+                }
+            } catch (e) {
+                // Some window properties can't be accessed, skip them
+            }
+        }
+
+        console.log('WARNING: Map not found after onload');
+    };
+
+    function buildMarkerRegistry() {
+        if (!cachedMapInstance) return;
+
+        for (var layerId in cachedMapInstance._layers) {
+            var layer = cachedMapInstance._layers[layerId];
+            if (!(layer instanceof L.Marker)) continue;
+
+            // Check both options and data attributes
+            if (layer.options && layer.options.markerId) {
+                markerRegistry[layer.options.markerId] = layer;
+                console.log('[buildMarkerRegistry] Registered marker:', layer.options.markerId);
+            }
+        }
+    }
+
+    function getMapInstance() {
+        return cachedMapInstance;
+    }
 
     function highlightMarker(markerId) {
-        if (!markerId || !markerMap[markerId]) return;
-        var marker = markerMap[markerId];
-        if (marker && marker._icon) {
-            marker._icon.classList.add('marker-highlighted');
-            marker.setZIndexOffset(1000);
+        console.log('[highlightMarker] Called with:', markerId);
+
+        var layer = markerRegistry[markerId];
+        if (!layer) {
+            console.log('[highlightMarker] Marker not found in registry');
+            return;
+        }
+
+        console.log('[highlightMarker] Found marker! Adding highlight');
+        if (layer._icon) {
+            layer._icon.classList.add('marker-highlighted');
+            layer.setZIndexOffset(1000);
+        } else {
+            console.log('[highlightMarker] Layer has no _icon');
         }
     }
 
     function unhighlightMarker(markerId) {
-        if (!markerId || !markerMap[markerId]) return;
-        var marker = markerMap[markerId];
-        if (marker && marker._icon) {
-            marker._icon.classList.remove('marker-highlighted');
-            marker.setZIndexOffset(0);
+        console.log('[unhighlightMarker] Called with:', markerId);
+        var layer = markerRegistry[markerId];
+        if (!layer) return;
+
+        console.log('[unhighlightMarker] Found marker, removing highlight');
+        if (layer._icon) {
+            layer._icon.classList.remove('marker-highlighted');
+            layer.setZIndexOffset(0);
         }
     }
 
     function panToMarker(markerId) {
-        if (!markerId || !markerMap[markerId]) return;
-        var marker = markerMap[markerId];
-        window.map.setView(marker.getLatLng(), 16);
+        console.log('[panToMarker] Called with:', markerId);
+
+        var mapInstance = getMapInstance();
+        console.log('[panToMarker] mapInstance available:', !!mapInstance);
+
+        if (!mapInstance) {
+            console.log('[panToMarker] mapInstance is null');
+            return;
+        }
+
+        var layer = markerRegistry[markerId];
+        if (!layer) {
+            console.log('[panToMarker] Marker not found');
+            return;
+        }
+
+        console.log('[panToMarker] Found marker! Panning and opening popup');
+        console.log('[panToMarker] Marker location:', layer.getLatLng());
+        mapInstance.setView(layer.getLatLng(), 16);
         setTimeout(function() {
-            marker.openPopup();
+            console.log('[panToMarker] Opening popup');
+            layer.openPopup();
         }, 300);
     }
 
-    // Hook into map creation to store marker references
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            if (window.map && window.map._layers) {
-                for (var id in window.map._layers) {
-                    var layer = window.map._layers[id];
-                    if (layer instanceof L.Marker && layer.options && layer.options.id) {
-                        markerMap[layer.options.id] = layer;
-                    }
-                }
-            }
-        }, 500);
-    });
+    // Map is found lazily when functions are called
 
     document.addEventListener('DOMContentLoaded', function() {
         // Make legend draggable
@@ -809,7 +956,7 @@ async def process_file(input_path, output_path, geojson_path, map_path):
                         lat, lng = await geocode_address(session, cache_conn, addr, opa)
                         neighborhood = "Unknown"
                         if lat and lng:
-                            neighborhood = await get_neighborhood(session, cache_conn, lat, lng)
+                            neighborhood = await get_neighborhood(session, cache_conn, lat, lng, addr)
                         return {
                             "auction_id": auction_id,
                             "status": status,
@@ -825,7 +972,7 @@ async def process_file(input_path, output_path, geojson_path, map_path):
                             "neighborhood": neighborhood,
                             "phila_link": f"https://property.phila.gov/?p={opa}" if opa else None,
                             "bid4assets_link": f"https://www.bid4assets.com/auction/index/{auction_id}",
-                            "streetview": f"https://www.google.com/maps?q={addr}&layer=c" if addr else None,
+                            "streetview": f"https://www.google.com/maps/place/{quote_plus(addr)}/" if addr else None,
                         }
 
                 tasks.append(worker())
@@ -890,7 +1037,7 @@ async def process_file(input_path, output_path, geojson_path, map_path):
     # -------------------------------------------
     # CREATE INTERACTIVE MAP
     # -------------------------------------------
-    create_interactive_map(results, map_path)
+    create_interactive_map(results, map_path, input_path)
 
     logger.info(f"✔ Processing complete!")
     logger.info(f"  - Excel output: {output_path}")

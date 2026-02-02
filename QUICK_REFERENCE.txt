@@ -1,0 +1,116 @@
+QUICK REFERENCE - AUCTION PROJECT CODEBASE
+
+ROOT DIRECTORY: /Users/snooplsm/auction/
+
+MAIN FILES:
+  /Users/snooplsm/auction/process_auctions.py      (Main Python script - 831 lines)
+  /Users/snooplsm/auction/20251205.html            (Latest generated map)
+  /Users/snooplsm/auction/AuctionMap.geojson       (Geographic data - GeoJSON format)
+  /Users/snooplsm/auction/geocode_cache.db         (SQLite cache)
+  /Users/snooplsm/auction/AuctionList_Processed.xlsx (Output spreadsheet)
+
+LEGEND DEFINITION:
+  Location: process_auctions.py, function _create_legend_html() at line 519
+  Red = Cluster (300 ft radius) - defined at line 596
+  Red marker created at line 442 with folium.Icon(color='red', icon='sitemap')
+  
+  Legend output HTML: Lines 60-291 in generated HTML files (20251205.html)
+  Legend Container ID: "legend" (draggable, positioned bottom-left)
+
+NEIGHBORHOOD DATA:
+  Current Status: All neighborhoods return "Unknown" (API not retrieving data)
+  
+  Functions:
+    - get_neighborhood() at line 122 (reverse geocoding)
+    - cache_get_neighborhood() at line 83
+    - cache_set_neighborhood() at line 94
+  
+  Processing Pipeline:
+    - Lines 709-732: Main processing loop calls geocode_address() then get_neighborhood()
+    - Result stored in "neighborhood" field of result dict
+  
+  Map Grouping:
+    - Lines 366-390: Properties grouped by neighborhood
+    - Creates Folium FeatureGroup for each neighborhood
+    - Lines 388-389: Creates feature groups with neighborhood name
+  
+  Database Table:
+    - geocode_cache.db, table: neighborhood_cache
+    - Schema: lat, lng, neighborhood (PRIMARY KEY: lat, lng)
+
+OPA DATA USAGE:
+  Input Processing: Lines 662, 688-692
+    - Read from "OPA" column header at line 662
+    - Split ampersand fields (line 692)
+  
+  Geocoding (Primary): Lines 202-220 in geocode_address()
+    - API Endpoint: https://api.phila.gov/ais_doc/v1/search/{OPA}
+    - Most accurate method, tried first
+  
+  Output Locations:
+    - Excel column: "OPA" (line 749)
+    - GeoJSON property: "opa" (line 21 in example)
+    - Popup display: Line 481-482
+    - Link generation: Line 729, "phila_link": f"https://property.phila.gov/?p={opa}"
+
+NOMINATIM API INTEGRATION:
+  Status: Already integrated and actively used
+  
+  Configuration:
+    - Endpoint: https://nominatim.openstreetmap.org/search (line 28)
+    - User-Agent: "AuctionProcessor/1.0 (your@email.com)" (line 31)
+  
+  Fallback Chain:
+    1. OPA API (primary)
+    2. Nominatim full address search (lines 225-244)
+    3. Nominatim zipcode fallback (lines 261-280)
+  
+  Rate Limiting:
+    - 1 second delay after Nominatim requests (lines 243, 279)
+    - 0.5 second delay after OPA requests (line 219)
+  
+  Cache:
+    - Table: cache in geocode_cache.db
+    - Schema: query (PRIMARY KEY), lat, lng
+    - Hit detection: Lines 192-199
+
+CLUSTERING:
+  Function: cluster_properties() at line 150
+  Distance Formula: Haversine distance (line 107)
+  Default Radius: 300 feet (configurable parameter)
+  Processing: Line 377 clusters properties per neighborhood
+  Visual: Red marker at cluster center (line 442)
+
+MAP VISUALIZATION:
+  Generator: create_interactive_map() at line 343
+  Library: Folium (Python mapping library)
+  
+  Components:
+    - Base map: OpenStreetMap tiles (line 362)
+    - Feature groups: One per neighborhood (line 389)
+    - Markers: Color-coded by status (line 399)
+    - Clusters: Red markers (line 442)
+    - Legend: Custom HTML (line 448-450)
+    - Layer control: Folium built-in (line 453)
+  
+  Output Format: HTML file (saved at line 456)
+
+DATA FLOW:
+  Excel Input → process_file() → geocode_address() + get_neighborhood()
+  → cache storage → create_interactive_map() → OUTPUTS:
+    1. AuctionList_Processed.xlsx
+    2. AuctionMap.geojson
+    3. [date].html (interactive map)
+
+KEY API ENDPOINTS:
+  Philadelphia AIS Search: https://api.phila.gov/ais_doc/v1/search/{OPA}
+  Philadelphia AIS Reverse: https://api.phila.gov/ais_doc/v1/reverse
+  Nominatim Search: https://nominatim.openstreetmap.org/search
+  Property Portal: https://property.phila.gov/?p={OPA}
+  Bid4Assets: https://www.bid4assets.com/auction/index/{ID}
+  Google Maps: https://www.google.com/maps?q={address}&layer=c
+
+ASYNC PROCESSING:
+  Workers: Concurrent semaphore limited to 5 (line 678)
+  Session: aiohttp.ClientSession (line 677)
+  Tasks: Gathered and awaited at line 737
